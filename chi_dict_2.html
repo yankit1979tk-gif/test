@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>《桂花雨》中文默書溫習</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","PingFang TC","Microsoft JhengHei",sans-serif;background:linear-gradient(135deg,#fff4d6,#ffe4ec);color:#333}
+.app{max-width:760px;margin:auto;padding:18px}
+.header{background:white;border-radius:28px;padding:25px 20px;text-align:center;box-shadow:0 8px 25px rgba(0,0,0,.08);margin-bottom:18px}
+.header h1{margin:0;font-size:30px}.header p{margin:8px 0;color:#777}.flower{font-size:45px}
+.stats{display:flex;justify-content:space-around;margin-top:18px;font-weight:bold}.stat{background:#fff6c7;border-radius:15px;padding:8px 14px}
+.menu{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.menu button{border:none;border-radius:20px;padding:20px 10px;font-size:18px;font-weight:bold;background:white;box-shadow:0 5px 15px rgba(0,0,0,.08);cursor:pointer}.menu button:active{transform:scale(.96)}
+.card{background:white;border-radius:25px;padding:24px;margin-top:15px;box-shadow:0 8px 25px rgba(0,0,0,.08)}
+.hidden{display:none}.section-title{font-size:25px;font-weight:bold;margin-bottom:15px}.word{font-size:38px;font-weight:bold;text-align:center;margin:25px 0}.meaning{text-align:center;color:#888;margin-bottom:15px}
+button.action{border:none;border-radius:15px;padding:13px 20px;margin:6px;font-size:17px;font-weight:bold;cursor:pointer;background:#ffe38a}
+button.voice{background:#d8f5e3}button.back{background:#eee}
+.options{display:grid;gap:12px}.option{border:none;background:#f5f5f5;border-radius:15px;padding:16px;font-size:20px;cursor:pointer}.option.correct{background:#bdf3c8}.option.wrong{background:#ffb9b9}
+.feedback{text-align:center;font-size:20px;font-weight:bold;min-height:30px;margin:15px}.progress{width:100%;height:12px;background:#eee;border-radius:20px;overflow:hidden;margin:15px 0}.progress-bar{height:100%;width:0%;background:#f3b34c;transition:width .3s}
+input.answer{width:100%;padding:15px;font-size:25px;border-radius:15px;border:2px solid #ddd;text-align:center;outline:none}
+textarea{width:100%;min-height:190px;padding:15px;font-size:22px;line-height:1.8;border:2px solid #ddd;border-radius:15px;resize:vertical}
+.memory-text{font-size:24px;line-height:2;text-align:left;padding:15px;background:#fffaf0;border-radius:15px}.blank{color:#e5a100;font-weight:bold}
+.result{text-align:center;padding:20px}.result .score{font-size:55px;font-weight:bold}.wrong-list{margin-top:20px;background:#fff3f3;padding:15px;border-radius:15px}.small{font-size:14px;color:#888}
+@media(max-width:500px){.header h1{font-size:25px}.word{font-size:34px}.memory-text{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="app">
+<div id="home">
+<div class="header">
+<div class="flower">🌼</div><h1>《桂花雨》</h1><p>中文默書小達人</p>
+<div class="stats"><div class="stat">⭐ 分數：<span id="totalScore">0</span></div><div class="stat">🏆 連勝：<span id="streak">0</span></div></div>
+</div>
+<div class="menu">
+<button onclick="startWords()">📖<br>詞語溫習</button>
+<button onclick="startQuiz()">🎯<br>詞語挑戰</button>
+<button onclick="startWriting()">✍️<br>默寫詞語</button>
+<button onclick="startMemory()">🧠<br>背默訓練</button>
+<button onclick="startDictation()">📝<br>背默大考</button>
+<button onclick="showMistakes()">❌<br>錯題重溫</button>
+</div></div>
+<div id="content" class="hidden"></div>
+</div>
+<script>
+const words=["故鄉","盛開","指指點點","迷人","颱風","香飄十里","成熟","完整","使勁","紛紛"];
+const passage="桂花樹的樣子笨笨的，不像梅樹那樣有姿態。不開花時，只見到滿樹的葉子；開花時，仔細地在樹叢裏尋找，才能看到那些小花。可是桂花的香氣，太迷人了。";
+let score=0,streak=0,mistakes=[],currentIndex=0,quizScore=0;
+
+function speak(text){
+ if(!("speechSynthesis"in window)){alert("你的瀏覽器不支援語音功能。");return}
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(text), voices=speechSynthesis.getVoices();
+ let v=voices.find(v=>v.lang.toLowerCase()==="zh-hk")||voices.find(v=>v.lang.toLowerCase().includes("zh-hk"))||voices.find(v=>v.lang.toLowerCase().includes("yue"));
+ if(v){u.voice=v;u.lang=v.lang}else u.lang="zh-HK";
+ u.rate=.78;u.pitch=1;u.volume=1;speechSynthesis.speak(u);
+}
+speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+function addScore(p){score=Math.max(0,score+p);document.getElementById("totalScore").textContent=score}
+function setStreak(v){streak=v;document.getElementById("streak").textContent=streak}
+function showContent(html){document.getElementById("home").classList.add("hidden");const c=document.getElementById("content");c.classList.remove("hidden");c.innerHTML=html}
+function backHome(){document.getElementById("content").classList.add("hidden");document.getElementById("home").classList.remove("hidden")}
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+
+function startWords(){currentIndex=0;showWord()}
+function showWord(){
+ const w=words[currentIndex];
+ showContent(`<div class="card"><div class="section-title">📖 詞語溫習</div><div class="progress"><div class="progress-bar" style="width:${((currentIndex+1)/words.length)*100}%"></div></div><div class="small">第 ${currentIndex+1} / ${words.length} 個</div><div class="word">${w}</div><div style="text-align:center"><button class="action voice" onclick="speak('${w}')">🔊 聽廣東話</button></div><div style="text-align:center;margin-top:20px"><button class="action" onclick="nextWord()">下一個 →</button><button class="action back" onclick="backHome()">返回</button></div></div>`)
+}
+function nextWord(){currentIndex++;if(currentIndex>=words.length){alert("🎉 10個詞語全部溫習完成！");backHome();return}showWord()}
+
+function startQuiz(){currentIndex=0;quizScore=0;showQuiz()}
+function showQuiz(){
+ const correct=words[currentIndex];let options=shuffle(words).slice(0,4);
+ if(!options.includes(correct)){options[0]=correct;options=shuffle(options)}
+ showContent(`<div class="card"><div class="section-title">🎯 詞語挑戰</div><div class="progress"><div class="progress-bar" style="width:${currentIndex/words.length*100}%"></div></div><div class="word">${correct}</div><div style="text-align:center"><button class="action voice" onclick="speak('${correct}')">🔊 聽讀音</button></div><p style="text-align:center">以下哪一個是正確詞語？</p><div class="options">${options.map(w=>`<button class="option" onclick="answerQuiz(this,'${w}','${correct}')">${w}</button>`).join("")}</div><div id="feedback" class="feedback"></div><button class="action back" onclick="backHome()">返回</button></div>`)
+}
+function answerQuiz(btn,ans,correct){
+ const f=document.getElementById("feedback");
+ if(ans===correct){btn.classList.add("correct");f.innerHTML="🎉 答對了！ +10 分";addScore(10);quizScore++;setStreak(streak+1)}
+ else{btn.classList.add("wrong");f.innerHTML=`❌ 答錯了！正確答案是「${correct}」`;mistakes.push(correct);setStreak(0)}
+ document.querySelectorAll(".option").forEach(b=>b.disabled=true);
+ setTimeout(()=>{currentIndex++;currentIndex>=words.length?showQuizResult():showQuiz()},1000)
+}
+function showQuizResult(){showContent(`<div class="card result"><div class="section-title">🎯 詞語挑戰完成！</div><div class="score">${quizScore*10}</div><p>${quizScore} / ${words.length} 題答對</p><p>${quizScore===10?"🏆 太厲害了！全部答對！":"💪 再挑戰一次，爭取滿分！"}</p><button class="action" onclick="startQuiz()">🔄 再玩一次</button><button class="action back" onclick="backHome()">返回主頁</button></div>`)}
+
+function startWriting(){currentIndex=0;quizScore=0;showWriting()}
+function showWriting(){
+ const w=words[currentIndex];
+ showContent(`<div class="card"><div class="section-title">✍️ 默寫詞語</div><div class="progress"><div class="progress-bar" style="width:${currentIndex/words.length*100}%"></div></div><p style="text-align:center">聽廣東話讀音，然後寫出詞語</p><div style="text-align:center"><button class="action voice" onclick="speak('${w}')">🔊 播放讀音</button></div><input id="answerInput" class="answer" placeholder="請輸入詞語" autocomplete="off"><div style="text-align:center"><button class="action" onclick="checkWriting()">✓ 確定</button></div><div id="writingFeedback" class="feedback"></div><button class="action back" onclick="backHome()">返回</button></div>`)
+}
+function checkWriting(){
+ const answer=document.getElementById("answerInput").value.trim(),correct=words[currentIndex],f=document.getElementById("writingFeedback");
+ if(answer===correct){f.innerHTML="🎉 正確！+10 分";addScore(10);quizScore++;setStreak(streak+1)}
+ else{f.innerHTML=`❌ 正確答案：「${correct}」`;mistakes.push(correct);setStreak(0)}
+ setTimeout(()=>{currentIndex++;currentIndex>=words.length?showWritingResult():showWriting()},1000)
+}
+function showWritingResult(){showContent(`<div class="card result"><div class="section-title">✍️ 默寫完成！</div><div class="score">${quizScore*10}</div><p>${quizScore} / ${words.length} 個正確</p><button class="action" onclick="startWriting()">🔄 再默一次</button><button class="action back" onclick="backHome()">返回主頁</button></div>`)}
+
+function startMemory(){currentIndex=0;showMemory()}
+function showMemory(){
+ let hideCount=Math.floor(passage.length*(currentIndex/6)),result="";
+ for(let i=0;i<passage.length;i++)result+=i<hideCount&&!["。","，","；"].includes(passage[i])?`<span class="blank">＿</span>`:passage[i];
+ showContent(`<div class="card"><div class="section-title">🧠 背默訓練</div><p>先讀熟句子，再逐步消失，最後嘗試背默。</p><div class="memory-text">${result}</div><div style="text-align:center"><button class="action voice" onclick="speak(passage)">🔊 聽廣東話朗讀</button><button class="action" onclick="nextMemory()">逐步消字 →</button></div><button class="action back" onclick="backHome()">返回</button></div>`)
+}
+function nextMemory(){
+ currentIndex++;
+ if(currentIndex>6){showContent(`<div class="card"><div class="section-title">🎉 背默挑戰！</div><p>現在嘗試不看內容，在下面完整輸入背默內容。</p><textarea id="memoryAnswer" placeholder="請輸入完整背默內容……"></textarea><div style="text-align:center"><button class="action" onclick="checkMemory()">✓ 檢查答案</button></div><div id="memoryFeedback" class="feedback"></div><button class="action back" onclick="backHome()">返回</button></div>`);return}
+ showMemory()
+}
+function normalizeText(t){return t.replace(/\s/g,"").replace(/　/g,"").trim()}
+function checkMemory(){
+ const a=normalizeText(document.getElementById("memoryAnswer").value),b=normalizeText(passage),f=document.getElementById("memoryFeedback");
+ if(a===b){f.innerHTML="🏆 完全正確！+50 分";addScore(50)}
+ else{let correct=0;for(let i=0;i<Math.min(a.length,b.length);i++)if(a[i]===b[i])correct++;let pct=Math.round(correct/b.length*100);f.innerHTML=`💪 大約 ${pct}% 正確，再試一次！`;mistakes.push("背默")}
+}
+function startDictation(){showContent(`<div class="card"><div class="section-title">📝 《桂花雨》背默大考</div><p>第一部分：10個詞語</p><p>第二部分：完整背默</p><hr><p>🔊 你可以播放廣東話讀音，但正式測驗時要靠自己作答。</p><button class="action" onclick="startWriting()">開始詞語默寫</button><button class="action back" onclick="backHome()">返回</button></div>`)}
+function showMistakes(){
+ const unique=[...new Set(mistakes)];
+ if(!unique.length){showContent(`<div class="card result"><div class="section-title">🌟 錯題重溫</div><p>暫時沒有錯題！</p><p>繼續保持！🏆</p><button class="action back" onclick="backHome()">返回</button></div>`);return}
+ showContent(`<div class="card"><div class="section-title">❌ 錯題重溫</div><p>以下是你之前答錯的內容：</p>${unique.map(w=>`<div style="background:#fff4f4;padding:15px;margin:10px 0;border-radius:15px;display:flex;justify-content:space-between;align-items:center"><strong style="font-size:23px">${w}</strong><button class="action voice" onclick="speak('${w}')">🔊</button></div>`).join("")}<div style="text-align:center"><button class="action" onclick="startWriting()">✍️ 再默一次</button><button class="action back" onclick="backHome()">返回</button></div></div>`)
+}
+document.addEventListener("click",()=>{if("speechSynthesis"in window)speechSynthesis.getVoices()},{once:true});
+</script>
+</body>
+</html>

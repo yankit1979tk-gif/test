@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小五溫習大師 StudyMaster P5</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', 'Fredoka', sans-serif;
+            background-color: #f0f9ff;
+        }
+        /* 3D Card Flip Animation */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Vocabulary Data
+        const VOCAB_DATA = [
+            { word: "properly", hint: "適當地 / 正確地", pos: "adv.", sentence: "You should behave properly at school." },
+            { word: "loudly", hint: "大聲地", pos: "adv.", sentence: "Do not talk loudly in the library." },
+            { word: "quietly", hint: "安靜地", pos: "adv.", sentence: "We should eat quietly in the restaurant." },
+            { word: "tidily", hint: "整潔地", pos: "adv.", sentence: "Please arrange your books tidily." },
+            { word: "messily", hint: "凌亂地", pos: "adv.", sentence: "He painted messily on the paper." },
+            { word: "early", hint: "早地", pos: "adv.", sentence: "I got up early this morning." },
+            { word: "carefully", hint: "小心地", pos: "adv.", sentence: "Listen carefully to your teacher." },
+            { word: "fast", hint: "快速地 (不加-ly)", pos: "adv.", sentence: "Cheetahs can run very fast." },
+            { word: "hard", hint: "努力地/辛苦地 (不加-ly)", pos: "adv.", sentence: "We must study hard for the exams." }
+        ];
+
+        const PASSAGE_SENTENCES = [
+            "It is important to have good manners.",
+            "To be considerate, you should care about the feelings of others.",
+            "When you treat others well, they will treat you well too.",
+            "For example, when you are at home, you should talk politely to your family.",
+            "When you are on the bus, you should offer your seat to people in need.",
+            "When you are in the restaurant, you should not play with the utensils."
+        ];
+
+        const RECITE_SENTENCES = [
+            "We should speak kindly to the waiter and eat quietly.",
+            "Being a good citizen makes the world a better place."
+        ];
+
+        const SUBJECTS = [
+            { en: "Chinese", zh: "中文" },
+            { en: "English", zh: "英文" },
+            { en: "Maths", zh: "數學" },
+            { en: "General Studies", zh: "常識" },
+            { en: "Music", zh: "音樂" },
+            { en: "Art", zh: "視藝" },
+            { en: "Computer", zh: "電腦" },
+            { en: "Putonghua", zh: "普通話" },
+            { en: "P.E.", zh: "體育" },
+            { en: "Science", zh: "科學" }
+        ];
+
+        const MANNERS_SCENARIOS = [
+            { text: "offer your seat to people in need", location: "on the bus" },
+            { text: "wait patiently to be seated", location: "at a restaurant" },
+            { text: "keep quiet and read silently", location: "in a library" },
+            { text: "greet your parents politely", location: "at home" },
+            { text: "turn off your phone during the show", location: "in the theatre" }
+        ];
+
+        // Main App Component
+        function App() {
+            const [activeTab, setActiveTab] = useState('flashcards');
+            const [points, setPoints] = useState(() => parseInt(localStorage.getItem('p5_points') || '50'));
+            const [speechSpeed, setSpeechSpeed] = useState(0.8);
+            const [targetScore, setTargetScore] = useState(() => localStorage.getItem('p5_target') || '95');
+            const [actualScore, setActualScore] = useState(() => localStorage.getItem('p5_actual') || '0');
+
+            useEffect(() => {
+                localStorage.setItem('p5_points', points);
+            }, [points]);
+
+            const addPoints = (amount) => {
+                setPoints(prev => prev + amount);
+                if (window.confetti) {
+                    window.confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
+                }
+            };
+
+            const speakText = (text) => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = speechSpeed;
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    alert("您的瀏覽器不支援語音朗讀功能");
+                }
+            };
+
+            return (
+                <div className="max-w-4xl mx-auto p-3 sm:p-6 pb-20">
+                    {/* Top Header */}
+                    <header className="bg-white rounded-3xl p-4 sm:p-6 shadow-md border-2 border-indigo-100 mb-6 flex flex-wrap justify-between items-center gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-indigo-200">
+                                🎓
+                            </div>
+                            <div>
+                                <h1 className="text-xl sm:text-2xl font-bold text-slate-800">小五溫習大師</h1>
+                                <p className="text-xs text-slate-500 font-medium">StudyMaster P5 • 默書與跨學科特訓</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 sm:gap-4 bg-indigo-50 px-4 py-2 rounded-2xl border border-indigo-100">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl">⭐</span>
+                                <div>
+                                    <div className="text-xs text-slate-500">學習積分</div>
+                                    <div className="text-lg font-bold text-indigo-700">{points} PTS</div>
+                                </div>
+                            </div>
+                            <div className="h-8 w-px bg-indigo-200"></div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl">🔊</span>
+                                <select 
+                                    value={speechSpeed} 
+                                    onChange={(e) => setSpeechSpeed(parseFloat(e.target.value))}
+                                    className="bg-white border border-indigo-200 text-xs rounded-lg p-1 text-slate-700 focus:outline-none"
+                                >
+                                    <option value="0.6">朗讀語速: 慢</option>
+                                    <option value="0.8">朗讀語速: 中</option>
+                                    <option value="1.0">朗讀語速: 快</option>
+                                </select>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Navigation Tabs */}
+                    <nav className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
+                        {[
+                            { id: 'flashcards', name: '🎴 單字閃卡', color: 'indigo' },
+                            { id: 'dictation', name: '📖 默書神幫手', color: 'indigo' },
+                            { id: 'subjects', name: '📚 學科詞彙關卡', color: 'blue' },
+                            { id: 'bonus', name: '🌟 禮貌大挑戰', color: 'emerald' },
+                            { id: 'tracker', name: '📊 成績與目標', color: 'amber' }
+                        ].map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`px-5 py-3 rounded-2xl font-bold text-sm transition-all whitespace-nowrap shadow-sm ${
+                                    activeTab === tab.id
+                                        ? 'bg-indigo-600 text-white shadow-indigo-200 shadow-md scale-105'
+                                        : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                                }`}
+                            >
+                                {tab.name}
+                            </button>
+                        ))}
+                    </nav>
+
+                    {/* Tab Content */}
+                    <main>
+                        {activeTab === 'flashcards' && <FlashcardModule speakText={speakText} addPoints={addPoints} />}
+                        {activeTab === 'dictation' && <DictationModule speakText={speakText} addPoints={addPoints} />}
+                        {activeTab === 'subjects' && <SubjectsModule speakText={speakText} addPoints={addPoints} />}
+                        {activeTab === 'bonus' && <BonusModule addPoints={addPoints} />}
+                        {activeTab === 'tracker' && (
+                            <TrackerModule 
+                                targetScore={targetScore} 
+                                setTargetScore={setTargetScore} 
+                                actualScore={actualScore} 
+                                setActualScore={setActualScore} 
+                                points={points}
+                                setPoints={setPoints}
+                            />
+                        )}
+                    </main>
+
+                    <footer className="mt-12 text-center text-xs text-slate-400">
+                        小五溫習大師 App • 支援離線下載溫習 • 可於網頁直接播放聲音
+                    </footer>
+                </div>
+            );
+        }
+
+        // --- FLASHCARD MODULE ---
+        function FlashcardModule({ speakText, addPoints }) {
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [isFlipped, setIsFlipped] = useState(false);
+            const currentItem = VOCAB_DATA[currentIndex];
+
+            const handleNext = () => {
+                setIsFlipped(false);
+                setCurrentIndex((prev) => (prev + 1) % VOCAB_DATA.length);
+            };
+
+            const handlePrev = () => {
+                setIsFlipped(false);
+                setCurrentIndex((prev) => (prev - 1 + VOCAB_DATA.length) % VOCAB_DATA.length);
+            };
+
+            const handleRandom = () => {
+                setIsFlipped(false);
+                const randomIndex = Math.floor(Math.random() * VOCAB_DATA.length);
+                setCurrentIndex(randomIndex);
+            };
+
+            const handleFlip = () => {
+                if (!isFlipped) {
+                    addPoints(2);
+                }
+                setIsFlipped(!isFlipped);
+            };
+
+            return (
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <span>🎴</span> 3D 翻牌單字閃卡
+                        </h2>
+                        <span className="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-full">
+                            卡片 {currentIndex + 1} / {VOCAB_DATA.length}
+                        </span>
+                    </div>
+
+                    <div className="perspective-1000 w-full h-72 cursor-pointer" onClick={handleFlip}>
+                        <div className={`relative w-full h-full duration-500 transform-style-3d transition-transform rounded-3xl shadow-xl ${isFlipped ? 'rotate-y-180' : ''}`}>
+                            
+                            <div className="absolute w-full h-full backface-hidden bg-gradient-to-br from-indigo-500 to-indigo-700 text-white rounded-3xl p-6 flex flex-col justify-between items-center text-center border-4 border-indigo-200">
+                                <div className="w-full flex justify-between items-center">
+                                    <span className="text-xs bg-white/20 px-3 py-1 rounded-full font-semibold">{currentItem.pos}</span>
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); speakText(currentItem.word); }}
+                                        className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-lg transition"
+                                        title="播放發音"
+                                    >
+                                        🔊
+                                    </button>
+                                </div>
+                                <div>
+                                    <div className="text-4xl font-extrabold tracking-wide mb-2">{currentItem.word}</div>
+                                    <p className="text-xs text-indigo-200">點擊卡片翻轉查看中文與例句</p>
+                                </div>
+                                <div className="text-xs text-indigo-200">💡 翻卡學習可獲 +2 積分</div>
+                            </div>
+
+                            <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-3xl p-6 flex flex-col justify-between items-center text-center border-4 border-emerald-200">
+                                <div className="w-full flex justify-between items-center">
+                                    <span className="text-xs bg-white/20 px-3 py-1 rounded-full font-semibold">釋義與例句</span>
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); speakText(currentItem.sentence); }}
+                                        className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-lg transition"
+                                        title="朗讀例句"
+                                    >
+                                        🔊
+                                    </button>
+                                </div>
+                                <div className="space-y-3">
+                                    <div className="text-2xl font-bold">{currentItem.hint}</div>
+                                    <div className="text-sm bg-black/20 p-3 rounded-xl italic">"{currentItem.sentence}"</div>
+                                </div>
+                                <div className="text-xs text-emerald-200">點擊卡片翻回正面</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center gap-3 pt-2">
+                        <button 
+                            onClick={handlePrev}
+                            className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 font-bold rounded-2xl text-xs sm:text-sm text-slate-700 transition"
+                        >
+                            👈 上一張
+                        </button>
+                        <button 
+                            onClick={handleRandom}
+                            className="px-4 py-3 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold rounded-2xl text-xs sm:text-sm transition"
+                        >
+                            🎲 隨機
+                        </button>
+                        <button 
+                            onClick={handleNext}
+                            className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl text-xs sm:text-sm transition shadow-md shadow-indigo-200"
+                        >
+                            下一張 👉
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- DICTATION MODULE ---
+        function DictationModule({ speakText, addPoints }) {
+            const [subMode, setSubMode] = useState('vocab');
+
+            return (
+                <div className="space-y-6">
+                    <div className="bg-white p-2 rounded-2xl border border-slate-200 flex gap-2">
+                        <button 
+                            onClick={() => setSubMode('vocab')}
+                            className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${subMode === 'vocab' ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 hover:text-slate-800'}`}
+                        >
+                            (i) Adverbs 副詞詞彙
+                        </button>
+                        <button 
+                            onClick={() => setSubMode('passage')}
+                            className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${subMode === 'passage' ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 hover:text-slate-800'}`}
+                        >
+                            (ii) Passage 段落聽聽默
+                        </button>
+                        <button 
+                            onClick={() => setSubMode('recite')}
+                            className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${subMode === 'recite' ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 hover:text-slate-800'}`}
+                        >
+                            (B) Recite 背默句型
+                        </button>
+                    </div>
+
+                    {subMode === 'vocab' && <VocabSection speakText={speakText} addPoints={addPoints} />}
+                    {subMode === 'passage' && <PassageSection speakText={speakText} addPoints={addPoints} />}
+                    {subMode === 'recite' && <ReciteSection speakText={speakText} addPoints={addPoints} />}
+                </div>
+            );
+        }
+
+        function VocabSection({ speakText, addPoints }) {
+            const [inputs, setInputs] = useState({});
+            const [results, setResults] = useState({});
+
+            const handleCheck = (word) => {
+                const userVal = (inputs[word] || '').trim().toLowerCase();
+                const isCorrect = userVal === word.toLowerCase();
+                setResults(prev => ({ ...prev, [word]: isCorrect }));
+                if (isCorrect) addPoints(5);
+            };
+
+            return (
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <span>🔤</span> Seen Dictation Vocabulary
+                        </h2>
+                        <span className="text-xs text-slate-500">按喇叭聽發音，填入正確英文字母</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {VOCAB_DATA.map((item, idx) => (
+                            <div key={item.word} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col justify-between gap-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="font-bold text-xs bg-slate-200 px-2 py-1 rounded-md text-slate-600">#{idx + 1}</span>
+                                    <button 
+                                        onClick={() => speakText(item.word)}
+                                        className="w-8 h-8 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center transition"
+                                        title="播放發音"
+                                    >
+                                        🔊
+                                    </button>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-bold text-slate-700">{item.hint}</div>
+                                    <div className="text-xs text-slate-400">{item.pos}</div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        placeholder="輸入英文..."
+                                        value={inputs[item.word] || ''}
+                                        onChange={(e) => setInputs({ ...inputs, [item.word]: e.target.value })}
+                                        className={`w-full px-3 py-1.5 text-sm rounded-xl border focus:outline-none ${
+                                            results[item.word] === true ? 'border-emerald-500 bg-emerald-50' : 
+                                            results[item.word] === false ? 'border-rose-500 bg-rose-50' : 'border-slate-300'
+                                        }`}
+                                    />
+                                    <button 
+                                        onClick={() => handleCheck(item.word)}
+                                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition"
+                                    >
+                                        檢查
+                                    </button>
+                                </div>
+                                {results[item.word] === true && <span className="text-xs text-emerald-600 font-bold">✨ 正確！ (+5分)</span>}
+                                {results[item.word] === false && <span className="text-xs text-rose-500 font-bold">❌ 答案是: {item.word}</span>}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function PassageSection({ speakText, addPoints }) {
+            const [currentSentenceIdx, setCurrentSentenceIdx] = useState(0);
+            const [userInput, setUserInput] = useState('');
+            const [feedback, setFeedback] = useState(null);
+
+            const sentence = PASSAGE_SENTENCES[currentSentenceIdx];
+
+            const handleVerify = () => {
+                const cleanUser = userInput.trim().replace(/\s+/g, ' ').toLowerCase();
+                const cleanTarget = sentence.trim().replace(/\s+/g, ' ').toLowerCase();
+
+                if (cleanUser === cleanTarget) {
+                    setFeedback({ success: true, msg: "太棒了！完全正確！" });
+                    addPoints(15);
+                } else {
+                    setFeedback({ success: false, msg: `正確答案： "${sentence}"` });
+                }
+            };
+
+            return (
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-bold text-slate-800">📝 Dictation Passage 聽默練習</h2>
+                        <span className="text-xs bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-full">
+                            句 {currentSentenceIdx + 1} / {PASSAGE_SENTENCES.length}
+                        </span>
+                    </div>
+
+                    <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 text-center space-y-4 mb-6">
+                        <p className="text-xs text-slate-500">點擊播放鍵聆聽句子，然後在下方輸入聽到的文字：</p>
+                        <button 
+                            onClick={() => speakText(sentence)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg shadow-indigo-200 inline-flex items-center gap-2 transition"
+                        >
+                            <span className="text-xl">🔊</span> 播放句子聲音
+                        </button>
+                    </div>
+
+                    <div className="space-y-4">
+                        <textarea 
+                            rows="3"
+                            value={userInput}
+                            onChange={(e) => setUserInput(e.target.value)}
+                            placeholder="聽完語音後，在此輸入全句英文..."
+                            className="w-full p-4 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none text-slate-700"
+                        />
+
+                        {feedback && (
+                            <div className={`p-4 rounded-2xl font-bold text-sm ${feedback.success ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
+                                {feedback.msg}
+                            </div>
+                        )}
+
+                        <div className="flex justify-between items-center pt-2">
+                            <button 
+                                onClick={() => {
+                                    setCurrentSentenceIdx(prev => Math.max(0, prev - 1));
+                                    setUserInput('');
+                                    setFeedback(null);
+                                }}
+                                disabled={currentSentenceIdx === 0}
+                                className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 disabled:opacity-40"
+                            >
+                                上一句
+                            </button>
+
+                            <button 
+                                onClick={handleVerify}
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2 rounded-xl text-sm transition"
+                            >
+                                核對答案
+                            </button>
+
+                            <button 
+                                onClick={() => {
+                                    setCurrentSentenceIdx(prev => Math.min(PASSAGE_SENTENCES.length - 1, prev + 1));
+                                    setUserInput('');
+                                    setFeedback(null);
+                                }}
+                                disabled={currentSentenceIdx === PASSAGE_SENTENCES.length - 1}
+                                className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 disabled:opacity-40"
+                            >
+                                下一句
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function ReciteSection({ speakText, addPoints }) {
+            return (
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <h2 className="text-lg font-bold text-slate-800">🗣️ Recite Dictation (背默金句)</h2>
+                    <p className="text-xs text-slate-500">反覆聆聽朗讀並熟記句型：</p>
+
+                    {RECITE_SENTENCES.map((sent, idx) => (
+                        <div key={idx} className="bg-amber-50/60 border border-amber-200 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div className="space-y-1">
+                                <span className="text-xs font-bold text-amber-800 bg-amber-200 px-2 py-0.5 rounded-md">句 {idx + 1}</span>
+                                <p className="font-semibold text-slate-800 text-sm sm:text-base">{sent}</p>
+                            </div>
+                            <button 
+                                onClick={() => { speakText(sent); addPoints(2); }}
+                                className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-amber-200 flex items-center gap-1 shrink-0"
+                            >
+                                🔊 朗讀 (+2分)
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
+        // --- SUBJECTS MODULE ---
+        function SubjectsModule({ speakText, addPoints }) {
+            const [selectedZh, setSelectedZh] = useState(null);
+            const [matched, setMatched] = useState([]);
+
+            const handleMatch = (subject) => {
+                if (!selectedZh) return;
+                if (selectedZh === subject.zh) {
+                    setMatched(prev => [...prev, subject.en]);
+                    setSelectedZh(null);
+                    speakText(subject.en);
+                    addPoints(10);
+                } else {
+                    alert("配對不正確，再試一次！");
+                    setSelectedZh(null);
+                }
+            };
+
+            return (
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-800">📚 Common Vocabulary (學科名稱連連看)</h2>
+                        <p className="text-xs text-slate-500">請先點擊左邊的中名，再點擊右邊對應的英文學科名稱：</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <h3 className="text-xs font-bold text-slate-400 mb-2">中文名稱</h3>
+                            {SUBJECTS.map(s => {
+                                const isDone = matched.includes(s.en);
+                                return (
+                                    <button
+                                        key={s.zh}
+                                        disabled={isDone}
+                                        onClick={() => setSelectedZh(s.zh)}
+                                        className={`w-full p-3 rounded-2xl text-left text-sm font-bold border transition ${
+                                            isDone ? 'bg-slate-100 text-slate-400 border-slate-200 line-through' :
+                                            selectedZh === s.zh ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                                        }`}
+                                    >
+                                        {s.zh}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div className="space-y-2">
+                            <h3 className="text-xs font-bold text-slate-400 mb-2">English Name</h3>
+                            {SUBJECTS.map(s => {
+                                const isDone = matched.includes(s.en);
+                                return (
+                                    <button
+                                        key={s.en}
+                                        disabled={isDone}
+                                        onClick={() => handleMatch(s)}
+                                        className={`w-full p-3 rounded-2xl text-left text-sm font-bold border transition ${
+                                            isDone ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-blue-50 hover:border-blue-300'
+                                        }`}
+                                    >
+                                        {s.en} {isDone && '✓'}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {matched.length === SUBJECTS.length && (
+                        <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-center text-emerald-700 font-bold">
+                            🎉 恭喜你！完成了所有學科名稱配對！
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- BONUS MODULE ---
+        function BonusModule({ addPoints }) {
+            const [answers, setAnswers] = useState({});
+
+            const locations = [
+                "on the bus",
+                "at a restaurant",
+                "in a library",
+                "at home",
+                "in the theatre"
+            ];
+
+            const handleSelect = (text, loc) => {
+                setAnswers(prev => ({ ...prev, [text]: loc }));
+                const targetItem = MANNERS_SCENARIOS.find(m => m.text === text);
+                if (targetItem && targetItem.location === loc) {
+                    addPoints(8);
+                }
+            };
+
+            return (
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-800">🌟 Bonus Dictation: 好禮貌配對大挑戰</h2>
+                        <p className="text-xs text-slate-500">將良好的行為配對到正確的公共場所/情境：</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        {MANNERS_SCENARIOS.map((item) => {
+                            const selected = answers[item.text];
+                            const isCorrect = selected === item.location;
+
+                            return (
+                                <div key={item.text} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                                    <p className="font-bold text-sm text-slate-800">“{item.text}”</p>
+
+                                    <div className="flex flex-wrap gap-2">
+                                        {locations.map(loc => (
+                                            <button
+                                                key={loc}
+                                                onClick={() => handleSelect(item.text, loc)}
+                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                                                    selected === loc 
+                                                        ? (isCorrect ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-rose-500 text-white border-rose-500')
+                                                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                                                }`}
+                                            >
+                                                {loc}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {selected && (
+                                        <p className={`text-xs font-bold ${isCorrect ? 'text-emerald-600' : 'text-rose-500'}`}>
+                                            {isCorrect ? '✨ 完全正確！' : `❌ 不對喔，正確地點應該是：${item.location}`}
+                                        </p>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        }
+
+        // --- TRACKER MODULE ---
+        function TrackerModule({ targetScore, setTargetScore, actualScore, setActualScore, points, setPoints }) {
+            const handleSave = () => {
+                localStorage.setItem('p5_target', targetScore);
+                localStorage.setItem('p5_actual', actualScore);
+                alert("成績與目標已成功儲存！");
+            };
+
+            const handleResetPoints = () => {
+                if (confirm("確定要重設學習積分嗎？")) {
+                    setPoints(0);
+                    localStorage.setItem('p5_points', '0');
+                }
+            };
+
+            return (
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-6">
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <span>📊</span> 成績追蹤與目標設定
+                        </h2>
+                        <p className="text-xs text-slate-500">設定你的默書目標，並紀錄每次測驗的結果！</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-amber-50/50 p-5 rounded-2xl border border-amber-200 space-y-3">
+                            <label className="block text-sm font-bold text-slate-700">🎯 下次默書目標分數</label>
+                            <input 
+                                type="number" 
+                                min="0" 
+                                max="100"
+                                value={targetScore} 
+                                onChange={(e) => setTargetScore(e.target.value)}
+                                className="w-full p-3 bg-white rounded-xl border border-amber-300 text-lg font-bold text-amber-700 focus:outline-none"
+                            />
+                            <p className="text-xs text-slate-500">保持目標在 90 分以上，加油！</p>
+                        </div>
+
+                        <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-200 space-y-3">
+                            <label className="block text-sm font-bold text-slate-700">📝 最近一次默書得分</label>
+                            <input 
+                                type="number" 
+                                min="0" 
+                                max="100"
+                                value={actualScore} 
+                                onChange={(e) => setActualScore(e.target.value)}
+                                className="w-full p-3 bg-white rounded-xl border border-blue-300 text-lg font-bold text-blue-700 focus:outline-none"
+                            />
+                            <p className="text-xs text-slate-500">記下你的成績，見證自己的進步！</p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap justify-between items-center gap-4 pt-4 border-t border-slate-100">
+                        <button 
+                            onClick={handleResetPoints}
+                            className="px-4 py-2 text-xs font-bold text-rose-500 hover:bg-rose-50 rounded-xl transition"
+                        >
+                            🔄 重設學習積分
+                        </button>
+                        <button 
+                            onClick={handleSave}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm shadow-md shadow-indigo-200 transition"
+                        >
+                            💾 儲存設定
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render React Application
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

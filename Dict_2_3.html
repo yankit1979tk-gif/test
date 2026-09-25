@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P.5 English Study Notes 2: Unit 2 & Dictation 2 + Quiz 1</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#4F46E5',
+                            lightBlue: '#EEF2FF',
+                            purple: '#7C3AED',
+                            green: '#10B981',
+                            yellow: '#F59E0B',
+                            pink: '#EC4899',
+                            rose: '#F43F5E'
+                        }
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #F8FAFC;
+        }
+        .font-heading {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        .card-hover {
+            transition: all 0.2s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Navbar Header -->
+    <header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-white text-indigo-600 rounded-2xl p-2.5 shadow-md flex items-center justify-center font-bold text-xl w-12 h-12">
+                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold font-heading leading-tight">Unit 2 & Dictation 2 + Quiz 1</h1>
+                    <p class="text-xs text-indigo-100 font-medium">QESOSA Branch Primary School • P.5 English Study Notes 2</p>
+                </div>
+            </div>
+
+            <!-- Global TTS Voice Setting -->
+            <div class="flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/30 text-xs">
+                <i class="fa-solid fa-volume-high text-yellow-300"></i>
+                <span>語音速度:</span>
+                <select id="ttsRate" class="bg-white/90 text-slate-800 rounded-lg text-xs px-2 py-1 font-semibold focus:outline-none">
+                    <option value="0.7">慢 (Slow)</option>
+                    <option value="0.9" selected>正常 (Normal)</option>
+                    <option value="1.1">快 (Fast)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="bg-indigo-900/40 backdrop-blur-sm border-t border-white/10">
+            <div class="max-w-5xl mx-auto px-4 flex justify-around md:justify-start space-x-2 md:space-x-4">
+                <button onclick="switchTab('study')" id="tab-study" class="tab-btn active px-4 py-2.5 text-sm md:text-base font-semibold flex items-center gap-2 border-b-4 border-yellow-400 text-yellow-300 transition-all">
+                    <i class="fa-solid fa-book-open"></i> 1. 溫習模式
+                </button>
+                <button onclick="switchTab('dictation')" id="tab-dictation" class="tab-btn px-4 py-2.5 text-sm md:text-base font-semibold flex items-center gap-2 border-b-4 border-transparent text-indigo-200 hover:text-white transition-all">
+                    <i class="fa-solid fa-spell-check"></i> 2. 默書練習
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-4 py-2.5 text-sm md:text-base font-semibold flex items-center gap-2 border-b-4 border-transparent text-indigo-200 hover:text-white transition-all">
+                    <i class="fa-solid fa-pen-ruler"></i> 3. 測驗 Mode
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-5xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: STUDY MODE (溫習模式) -->
+        <!-- ========================================== -->
+        <section id="view-study" class="space-y-8">
+            
+            <!-- Category Filter Buttons for Study -->
+            <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
+                <button onclick="filterStudyCategory('all')" id="study-cat-all" class="study-cat-btn bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">全部內容 (All)</button>
+                <button onclick="filterStudyCategory('feelings')" id="study-cat-feelings" class="study-cat-btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Dictation 2: 心情詞彙</button>
+                <button onclick="filterStudyCategory('recite')" id="study-cat-recite" class="study-cat-btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Dictation 2: 默寫句子</button>
+                <button onclick="filterStudyCategory('months')" id="study-cat-months" class="study-cat-btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Common: 月份 (Months)</button>
+                <button onclick="filterStudyCategory('verbs')" id="study-cat-verbs" class="study-cat-btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Unit 2: 動詞與介詞</button>
+                <button onclick="filterStudyCategory('personality')" id="study-cat-personality" class="study-cat-btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Unit 2: 性格形容詞</button>
+                <button onclick="filterStudyCategory('rules')" id="study-cat-rules" class="study-cat-btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Unit 2: 文法 Focus</button>
+            </div>
+
+            <!-- SECTION: Dictation 2 Feelings -->
+            <div id="section-feelings" class="study-section space-y-4">
+                <div class="flex items-center gap-3 border-b-2 border-purple-200 pb-2">
+                    <span class="bg-purple-600 text-white rounded-lg px-3 py-1 font-bold text-sm">Dictation 2</span>
+                    <h2 class="text-xl font-bold text-slate-800 font-heading">A. Feelings & Emotions Vocabulary (心情與感覺)</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="feelingsContainer"></div>
+            </div>
+
+            <!-- SECTION: Dictation 2 Recite Sentences -->
+            <div id="section-recite" class="study-section space-y-4">
+                <div class="flex items-center gap-3 border-b-2 border-pink-200 pb-2">
+                    <span class="bg-pink-600 text-white rounded-lg px-3 py-1 font-bold text-sm">Dictation 2</span>
+                    <h2 class="text-xl font-bold text-slate-800 font-heading">B. Recite Dictation (背默句子)</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="reciteContainer"></div>
+            </div>
+
+            <!-- SECTION: Common Vocabulary - Months -->
+            <div id="section-months" class="study-section space-y-4">
+                <div class="flex items-center gap-3 border-b-2 border-blue-200 pb-2">
+                    <span class="bg-blue-600 text-white rounded-lg px-3 py-1 font-bold text-sm">Common</span>
+                    <h2 class="text-xl font-bold text-slate-800 font-heading">C. Common Vocabulary (Months of the Year)</h2>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3" id="monthsContainer"></div>
+            </div>
+
+            <!-- SECTION: Verb + Preposition -->
+            <div id="section-verbs" class="study-section space-y-4">
+                <div class="flex items-center gap-3 border-b-2 border-indigo-200 pb-2">
+                    <span class="bg-indigo-600 text-white rounded-lg px-3 py-1 font-bold text-sm">Unit 2</span>
+                    <h2 class="text-xl font-bold text-slate-800 font-heading">a. Verb + Preposition (動詞 + 介詞)</h2>
+                </div>
+
+                <!-- Grammar Note Card -->
+                <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-2xl shadow-sm text-sm text-amber-900">
+                    <div class="font-bold flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-circle-info text-amber-500"></i> Be-verbs 補充提示 (Grammar Note):
+                    </div>
+                    <p class="mb-2">動詞短語中的 <code class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-900 font-semibold">be</code> 需要根據人稱與時態作相應變化：</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-white/80 p-2.5 rounded-xl border border-amber-200">
+                        <div><strong>Present (現在式):</strong> am / is / are</div>
+                        <div><strong>Past (過去式):</strong> was / were</div>
+                        <div class="col-span-1 sm:col-span-2 text-slate-600 mt-1">
+                            • <i>He / She / It</i> ➔ <b>is / was</b><br>
+                            • <i>You / We / They</i> ➔ <b>are / were</b><br>
+                            • <i>I</i> ➔ <b>am / was</b>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="verbPrepContainer"></div>
+            </div>
+
+            <!-- SECTION: Personality Adjectives -->
+            <div id="section-personality" class="study-section space-y-4">
+                <div class="flex items-center gap-3 border-b-2 border-emerald-200 pb-2">
+                    <span class="bg-emerald-600 text-white rounded-lg px-3 py-1 font-bold text-sm">Unit 2</span>
+                    <h2 class="text-xl font-bold text-slate-800 font-heading">b. Adjectives of Personality (性格形容詞)</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Positive -->
+                    <div class="space-y-3">
+                        <h3 class="text-base font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 inline-block">
+                            <i class="fa-solid fa-face-smile mr-1"></i> Positive (正面性格)
+                        </h3>
+                        <div class="space-y-3" id="positiveAdjContainer"></div>
+                    </div>
+                    <!-- Negative -->
+                    <div class="space-y-3">
+                        <h3 class="text-base font-bold text-rose-700 bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-200 inline-block">
+                            <i class="fa-solid fa-face-frown mr-1"></i> Negative (負面性格)
+                        </h3>
+                        <div class="space-y-3" id="negativeAdjContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: Grammar Focus & Friend Actions -->
+            <div id="section-rules" class="study-section space-y-4">
+                <div class="flex items-center gap-3 border-b-2 border-sky-200 pb-2">
+                    <span class="bg-sky-600 text-white rounded-lg px-3 py-1 font-bold text-sm">Unit 2 Focus</span>
+                    <h2 class="text-xl font-bold text-slate-800 font-heading">c. Friends Actions & Language Focus</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Should vs Shouldn't -->
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                        <h3 class="font-bold text-slate-800 text-base border-b pb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-thumbs-up text-emerald-500"></i> What SHOULD a good friend do?
+                        </h3>
+                        <ul class="text-xs space-y-1.5 text-slate-700 list-disc list-inside">
+                            <li>share things with one another</li>
+                            <li>share feelings with one another</li>
+                            <li>help one another</li>
+                            <li>support / listen to one another</li>
+                            <li>take care of one another</li>
+                            <li>get on with one another</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
+                        <h3 class="font-bold text-slate-800 text-base border-b pb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-thumbs-down text-rose-500"></i> What SHOULDN'T a good friend do?
+                        </h3>
+                        <ul class="text-xs space-y-1.5 text-slate-700 list-disc list-inside">
+                            <li>be mean to one another</li>
+                            <li>argue with one another</li>
+                            <li>fight with one another</li>
+                            <li>lie to one another</li>
+                            <li>laugh at one another</li>
+                            <li>shout at one another</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Language Focus Card -->
+                <div class="bg-gradient-to-r from-sky-50 to-indigo-50 border-2 border-sky-200 rounded-2xl p-5 space-y-3 text-xs sm:text-sm text-slate-800">
+                    <h3 class="font-bold text-indigo-900 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-key text-yellow-500"></i> Language Focus: Each other vs. One another
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="bg-white p-3 rounded-xl border border-sky-100 shadow-sm">
+                            <span class="font-bold text-indigo-600 text-sm">each other</span>
+                            <p class="text-slate-600 mt-1">用來指 <b>兩個人 (two people)</b></p>
+                            <p class="mt-2 text-slate-800 bg-slate-50 p-2 rounded border"><i>e.g. Mark and Sarah are friends. They shouldn't quarrel with <b>each other</b>.</i></p>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-sky-100 shadow-sm">
+                            <span class="font-bold text-purple-600 text-sm">one another</span>
+                            <p class="text-slate-600 mt-1">用來指 <b>多於兩個人 (more than two people)</b></p>
+                            <p class="mt-2 text-slate-800 bg-slate-50 p-2 rounded border"><i>e.g. Friends shouldn't be jealous of <b>one another</b>.</i></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 2: DICTATION MODE (默書練習模式) -->
+        <!-- ========================================== -->
+        <section id="view-dictation" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-md p-6 border border-slate-200 max-w-2xl mx-auto">
+                
+                <!-- Target vs Actual Score Tracker -->
+                <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-4 rounded-2xl shadow-sm mb-6 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-bullseye text-3xl text-yellow-300"></i>
+                        <div>
+                            <div class="text-xs text-purple-100 font-semibold">Dictation 2 Target Score: 100</div>
+                            <div class="text-lg font-bold font-heading">默書目標分數 vs 實際得分</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white/20 backdrop-blur-md px-4 py-2 rounded-xl border border-white/30 text-sm font-bold">
+                        <div>目標: <span class="text-yellow-300">100</span></div>
+                        <div class="border-l border-white/40 h-4"></div>
+                        <div>得分: <span id="dictationScoreVal" class="text-green-300 text-lg">0</span></div>
+                    </div>
+                </div>
+
+                <div class="text-center mb-4">
+                    <h2 class="text-2xl font-bold text-slate-800 font-heading">聽音拼字 / 默寫練習</h2>
+                    <p class="text-xs text-slate-500 mt-1">點擊播放聽力語音，並在輸入框中輸入正確英文！</p>
+                </div>
+
+                <!-- Dictation Setup Selector -->
+                <div class="flex justify-center items-center gap-3 mb-6 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <label for="dictationCategory" class="text-xs font-bold text-slate-700">選擇默書範圍:</label>
+                    <select id="dictationCategory" onchange="initDictation()" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-purple-500 outline-none">
+                        <option value="feelings">1. Feelings (Dictation 2 心情詞彙)</option>
+                        <option value="recite">2. Recite Sentences (Dictation 2 背默句子)</option>
+                        <option value="months">3. Months (Common Vocabulary 月份)</option>
+                        <option value="verbs">4. Verb + Preposition (Unit 2)</option>
+                        <option value="personality">5. Adjectives (Unit 2 性格形容詞)</option>
+                        <option value="all">6. 全部混合 (All Mixed)</option>
+                    </select>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-100 rounded-full h-2.5 mb-6 overflow-hidden border">
+                    <div id="dictationProgressBar" class="bg-purple-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+
+                <!-- Dictation Interactive Card -->
+                <div class="bg-purple-50/50 border-2 border-purple-200 rounded-2xl p-6 sm:p-8 relative text-center">
+                    <!-- Question Counter -->
+                    <div class="text-xs font-bold text-purple-600 uppercase tracking-wider mb-2">
+                        Question <span id="dictationCurrentIdx">1</span> of <span id="dictationTotalIdx">0</span>
+                    </div>
+
+                    <!-- Audio Play Controls -->
+                    <div class="my-4">
+                        <button onclick="playDictationAudio()" class="w-20 h-20 bg-gradient-to-tr from-purple-600 to-indigo-500 hover:scale-105 active:scale-95 text-white rounded-full shadow-lg flex items-center justify-center mx-auto transition-all">
+                            <i class="fa-solid fa-volume-high text-3xl"></i>
+                        </button>
+                        <p class="text-xs text-slate-500 mt-2 font-medium">按鈕收聽語音發音</p>
+                    </div>
+
+                    <!-- Context / Hint Display -->
+                    <div class="my-3 text-xs sm:text-sm text-slate-600 font-medium">
+                        <span id="dictationChineseHint" class="bg-white px-3 py-1.5 rounded-lg border border-purple-100 shadow-sm text-slate-700 inline-block">中文提示: 感到困惑的</span>
+                    </div>
+
+                    <!-- User Input Field -->
+                    <div class="max-w-md mx-auto space-y-3">
+                        <textarea id="dictationInput" rows="2" placeholder="請在此輸入英文單詞或句子..." autocomplete="off" spellcheck="false" class="w-full text-center text-base sm:text-lg font-bold py-3 px-4 rounded-xl border-2 border-slate-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all resize-none"></textarea>
+                        
+                        <div class="flex gap-2 justify-center">
+                            <button onclick="checkDictationAnswer()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-xl shadow transition-all text-sm">
+                                提交答案 (Check)
+                            </button>
+                            <button onclick="revealDictationHint()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-4 py-3 rounded-xl transition-all text-sm" title="顯示提示">
+                                <i class="fa-solid fa-lightbulb"></i> 提示
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Box -->
+                    <div id="dictationFeedback" class="mt-4 p-3 rounded-xl text-xs sm:text-sm font-bold hidden"></div>
+                </div>
+
+                <!-- Footer Action Controls -->
+                <div class="flex justify-between items-center mt-6">
+                    <button onclick="prevDictation()" id="btnPrevDict" class="text-slate-500 hover:text-slate-800 font-semibold text-xs px-3 py-2 rounded-lg border border-slate-200 disabled:opacity-40">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> 上一題
+                    </button>
+                    <button onclick="nextDictation()" id="btnNextDict" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs px-4 py-2 rounded-xl transition-all">
+                        下一題 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 3: QUIZ MODE (測驗/Quiz模式) -->
+        <!-- ========================================== -->
+        <section id="view-quiz" class="hidden space-y-6">
+            <!-- Start Screen -->
+            <div id="quizStartCard" class="bg-white rounded-2xl shadow-md p-8 border border-slate-200 text-center max-w-xl mx-auto space-y-6">
+                <div class="w-16 h-16 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center mx-auto text-3xl">
+                    <i class="fa-solid fa-pen-clip"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 font-heading">Quiz 1 & Unit 2 綜合測驗</h2>
+                    <p class="text-slate-600 text-xs sm:text-sm mt-2">測試你對 Feelings 心情詞彙、Recite 句型、動詞介詞與性格形容詞的理解！</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl text-left text-xs text-slate-600 space-y-2 border">
+                    <div class="font-bold text-slate-800 text-sm mb-1"><i class="fa-solid fa-check-circle text-green-500 mr-1"></i> 測驗規則：</div>
+                    <p>• 包含單詞意涵、介詞運用、Recite 句型填空與性格形容詞測驗。</p>
+                    <p>• 共 12 道精選題目，每題答對得 10 分。</p>
+                    <p>• 答題後即時提供正解與文法詳細解析。</p>
+                </div>
+                <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all text-base">
+                    開始測驗 (Start Quiz)
+                </button>
+            </div>
+
+            <!-- Active Quiz Container (Hidden initially) -->
+            <div id="quizContainer" class="hidden bg-white rounded-2xl shadow-md p-6 sm:p-8 border border-slate-200 max-w-2xl mx-auto space-y-6">
+                <!-- Header Status -->
+                <div class="flex justify-between items-center border-b pb-4">
+                    <div>
+                        <span class="text-xs font-bold text-pink-600 uppercase tracking-wider">Question <span id="quizCurrentNum">1</span>/12</span>
+                        <h3 class="text-base font-bold text-slate-800" id="quizTypeTitle">多項選擇題</h3>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-500">目前得分</span>
+                        <div class="text-lg font-extrabold text-pink-600" id="quizLiveScore">0</div>
+                    </div>
+                </div>
+
+                <!-- Quiz Progress Bar -->
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div id="quizProgressBar" class="bg-pink-500 h-2 rounded-full transition-all duration-300" style="width: 8%"></div>
+                </div>
+
+                <!-- Question Title Box -->
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <p id="quizQuestionText" class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed">
+                        Question text goes here...
+                    </p>
+                </div>
+
+                <!-- Options Grid -->
+                <div id="quizOptions" class="grid grid-cols-1 gap-3"></div>
+
+                <!-- Feedback & Explanation Box -->
+                <div id="quizExplanation" class="p-4 rounded-xl text-xs sm:text-sm hidden space-y-1"></div>
+
+                <!-- Bottom Next Button -->
+                <div class="flex justify-end pt-2">
+                    <button onclick="nextQuizQuestion()" id="btnNextQuiz" disabled class="bg-slate-300 text-slate-500 font-bold px-6 py-2.5 rounded-xl transition-all cursor-not-allowed text-sm">
+                        下一題 <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Results Card (Hidden initially) -->
+            <div id="quizResultCard" class="hidden bg-white rounded-2xl shadow-lg p-8 border border-slate-200 text-center max-w-lg mx-auto space-y-6">
+                <div id="resultIcon" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold font-heading text-slate-800" id="resultTitle">測驗完成！</h2>
+                    <p class="text-slate-600 text-xs sm:text-sm mt-1" id="resultSubtitle">這是在這次測驗中的表現：</p>
+                </div>
+
+                <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                    <div class="text-4xl font-extrabold text-indigo-600 font-heading" id="finalScoreText">120 / 120</div>
+                    <div class="text-xs text-indigo-500 font-semibold mt-1" id="scoreFeedback">太棒了！你非常熟練！</div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="switchTab('study')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all text-xs sm:text-sm">
+                        重新溫習
+                    </button>
+                    <button onclick="startQuiz()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition-all text-xs sm:text-sm">
+                        再測驗一次
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-8">
+        <div class="max-w-5xl mx-auto px-4 space-y-1">
+            <p>© QUEEN ELIZABETH SCHOOL OLD STUDENTS' ASSOCIATION BRANCH PRIMARY SCHOOL</p>
+            <p class="text-slate-400">P.5 English • Study Notes 2 (Unit 2: Be a good friend & Dictation 2 + Quiz 1)</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Engine -->
+    <script>
+        // Data Sources from PDFs 1, 2, 3
+        const dataFeelings = [
+            { id: 'f1', word: 'awesome', chinese: '極好的 / 棒極了', example: 'We had an awesome time at the party.' },
+            { id: 'f2', word: 'shocked', chinese: '震驚的 / 吃驚的', example: 'I was shocked by the bad news.' },
+            { id: 'f3', word: 'embarrassed', chinese: '尷尬的 / 難為情', example: 'He felt embarrassed when he fell down.' },
+            { id: 'f4', word: 'upset', chinese: '沮喪的 / 心煩的', example: 'I was a bit upset because my friend copied my homework.' },
+            { id: 'f5', word: 'awful', chinese: '極壞的 / 糟糕的', example: 'The weather today is awful.' },
+            { id: 'f6', word: 'angry', chinese: '憤怒的 / 生氣的', example: 'Mom was angry when I broke the vase.' },
+            { id: 'f7', word: 'nervous', chinese: '緊張的', example: 'She was nervous before the English exam.' },
+            { id: 'f8', word: 'puzzled', chinese: '困惑的 / 不解的', example: 'He looked puzzled by the difficult question.' },
+            { id: 'f9', word: 'sad', chinese: '悲傷的 / 難過的', example: 'Mary felt sad when her puppy was sick.' }
+        ];
+
+        const dataRecite = [
+            { id: 'r1', target: 'I was a bit upset because my friend copied my homework.', chinese: '我有點沮喪，因為我的朋友抄襲了我的功課。' },
+            { id: 'r2', target: 'Friends shouldn\'t be jealous of one another.', chinese: '朋友之間不應該互相嫉妒。' }
+        ];
+
+        const dataMonths = [
+            { id: 'm1', word: 'April', chinese: '四月' },
+            { id: 'm2', word: 'May', chinese: '五月' },
+            { id: 'm3', word: 'June', chinese: '六月' },
+            { id: 'm4', word: 'July', chinese: '七月' },
+            { id: 'm5', word: 'August', chinese: '八月' },
+            { id: 'm6', word: 'September', chinese: '九月' },
+            { id: 'm7', word: 'October', chinese: '十月' },
+            { id: 'm8', word: 'November', chinese: '十一月' },
+            { id: 'm9', word: 'December', chinese: '十二月' }
+        ];
+
+        const dataVerbPrep = [
+            {
+                prep: 'of',
+                color: 'blue',
+                items: [
+                    { id: 'vp1', english: 'take care of', chinese: '照顧', example: 'Robin takes care of John.' },
+                    { id: 'vp2', english: 'be afraid of', chinese: '害怕', example: 'She is afraid of dogs.' },
+                    { id: 'vp3', english: 'be jealous of', chinese: '嫉妒 / 羨慕', example: 'Friends shouldn\'t be jealous of one another.' }
+                ]
+            },
+            {
+                prep: 'at',
+                color: 'amber',
+                items: [
+                    { id: 'vp4', english: 'laugh at', chinese: '取笑 / 對...笑', example: 'Do not laugh at other people.' },
+                    { id: 'vp5', english: 'shout at', chinese: '對...大喊大叫', example: 'Robin shouts at John. He is rude.' }
+                ]
+            },
+            {
+                prep: 'to',
+                color: 'emerald',
+                items: [
+                    { id: 'vp6', english: 'listen to', chinese: '傾聽 / 聽', example: 'Mary listens to Robin. She is so patient.' },
+                    { id: 'vp7', english: 'talk to', chinese: '與...說話', example: 'Mary talks softly to Robin. She is a polite girl.' },
+                    { id: 'vp8', english: 'be nice to', chinese: '對...友善/好', example: 'She is nice to Robin.' },
+                    { id: 'vp9', english: 'be mean to', chinese: '對...刻薄/惡劣', example: 'John is mean. He always laughs at Robin.' }
+                ]
+            },
+            {
+                prep: 'with',
+                color: 'purple',
+                items: [
+                    { id: 'vp10', english: 'discuss with', chinese: '與...討論', example: 'I discuss the project with my classmate.' },
+                    { id: 'vp11', english: 'quarrel with', chinese: '與...爭吵', example: 'Mary always quarrels with Robin.' },
+                    { id: 'vp12', english: 'get on with', chinese: '與...相處', example: 'Mary gets on with other people.' },
+                    { id: 'vp13', english: 'agree with', chinese: '同意 / 贊同', example: 'I agree with your idea.' },
+                    { id: 'vp14', english: 'help (someone) with (something)', chinese: '在...方面幫助(某人)', example: 'I help John with his homework.' },
+                    { id: 'vp15', english: 'share (something) with (someone)', chinese: '與(某人)分享(某物)', example: 'I share my book with you.' }
+                ]
+            }
+        ];
+
+        const dataPositiveAdj = [
+            { word: 'nice / kind / friendly', chinese: '友善的 / 好意的', example: 'Mary is a nice girl. She is nice to Robin.' },
+            { word: 'caring', chinese: '關心他人的 / 體貼的', example: 'Robin takes care of John. He is a caring boy.' },
+            { word: 'patient', chinese: '有耐性的', example: 'Mary listens to Robin. She is so patient.' },
+            { word: 'helpful', chinese: '樂於助人的', example: 'Mary is helpful. She helps Robin with his homework.' },
+            { word: 'polite', chinese: '有禮貌的', example: 'Mary talks softly to Robin. She is a polite girl.' },
+            { word: 'generous', chinese: '慷慨的 / 大方的', example: 'Mary is generous. She shares her cake with Robin.' },
+            { word: 'easy-going', chinese: '隨和的 / 好相處的', example: 'Mary is easy-going. She gets on with other people.' }
+        ];
+
+        const dataNegativeAdj = [
+            { word: 'unkind', chinese: '不友善的', example: 'Robin fights with John. He is unkind to him.' },
+            { word: 'rude / impolite', chinese: '粗魯的 / 無禮的', example: 'Robin shouts at John. He is rude.' },
+            { word: 'mean', chinese: '刻薄的 / 惡劣的', example: 'John is mean. He always laughs at Robin.' },
+            { word: 'selfish', chinese: '自私的', example: 'John doesn\'t share his things with other people. He is selfish.' },
+            { word: 'bad-tempered', chinese: '脾氣暴躁的', example: 'Mary always quarrels with Robin. She is bad-tempered.' }
+        ];
+
+        const quizQuestions = [
+            {
+                question: "Why was the student upset in the Recite sentence? 'I was a bit upset because my friend _____ my homework.'",
+                options: ['copied', 'borrowed', 'bought', 'lost'],
+                correct: 0,
+                explanation: "Recite 原句為：'I was a bit upset because my friend copied my homework.'"
+            },
+            {
+                question: "Fill in the blank: 'Friends shouldn't be jealous _____ one another.'",
+                options: ['at', 'of', 'to', 'with'],
+                correct: 1,
+                explanation: "'be jealous of' 意為嫉妒或羨慕。"
+            },
+            {
+                question: "Which word means feeling uncomfortable or shy because of a silly mistake?",
+                options: ['awesome', 'embarrassed', 'patient', 'generous'],
+                correct: 1,
+                explanation: "'embarrassed' 意思為尷尬的、難為情的。"
+            },
+            {
+                question: "John doesn't share his toys with other people. He is a _____ boy.",
+                options: ['generous', 'selfish', 'helpful', 'caring'],
+                correct: 1,
+                explanation: "不願分享事物的人是自私的 (selfish)。"
+            },
+            {
+                question: "Mary listens to Robin carefully without getting annoyed. She is so _____.",
+                options: ['patient', 'bad-tempered', 'rude', 'puzzled'],
+                correct: 0,
+                explanation: "耐心傾聽他人代表有耐性 (patient)。"
+            },
+            {
+                question: "Robin shouts at John. He is _____.",
+                options: ['polite', 'caring', 'rude / impolite', 'easy-going'],
+                correct: 2,
+                explanation: "對別人大喊大叫 (shout at) 是粗魯無禮的 (rude / impolite)。"
+            },
+            {
+                question: "Mark and Sarah (2 people) are friends. They shouldn't quarrel with _____.",
+                options: ['each other', 'one another', 'the other', 'others'],
+                correct: 0,
+                explanation: "文法規定：指兩個人 (two people) 時使用 'each other'。"
+            },
+            {
+                question: "More than two friends should support and listen to _____.",
+                options: ['each other', 'one another', 'the other', 'themselves'],
+                correct: 1,
+                explanation: "文法規定：指多於兩個人 (>2 people) 時使用 'one another'。"
+            },
+            {
+                question: "Which of the following is a month of the year?",
+                options: ['Monday', 'September', 'Summer', 'Yesterday'],
+                correct: 1,
+                explanation: "September (九月) 是 Common Vocabulary 中的月份名詞。"
+            },
+            {
+                question: "Fill in the preposition: 'Mary helps Robin _____ his homework.'",
+                options: ['with', 'at', 'to', 'of'],
+                correct: 0,
+                explanation: "句型為：help (someone) with (something)。"
+            },
+            {
+                question: "He looked _____ when he couldn't solve the math riddle.",
+                options: ['puzzled', 'awesome', 'polite', 'generous'],
+                correct: 0,
+                explanation: "'puzzled' 意思為感到困惑的。"
+            },
+            {
+                question: "Robin fights with John. He is _____ to him.",
+                options: ['unkind', 'caring', 'helpful', 'patient'],
+                correct: 0,
+                explanation: "打架 (fights with) 展現出不友善 (unkind)。"
+            }
+        ];
+
+        // Speech Engine
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            const rateSelect = document.getElementById('ttsRate');
+            if (rateSelect) utterance.rate = parseFloat(rateSelect.value) || 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Tab Switcher
+        function switchTab(tabName) {
+            document.getElementById('view-study').classList.add('hidden');
+            document.getElementById('view-dictation').classList.add('hidden');
+            document.getElementById('view-quiz').classList.add('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-yellow-400', 'text-yellow-300');
+                btn.classList.add('border-transparent', 'text-indigo-200');
+            });
+
+            const activeTabBtn = document.getElementById(`tab-${tabName}`);
+            activeTabBtn.classList.remove('border-transparent', 'text-indigo-200');
+            activeTabBtn.classList.add('border-yellow-400', 'text-yellow-300');
+
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+
+            if (tabName === 'dictation') initDictation();
+        }
+
+        // Render Study View Elements
+        function renderStudyView() {
+            // Feelings
+            const feelingsBox = document.getElementById('feelingsContainer');
+            feelingsBox.innerHTML = dataFeelings.map(item => `
+                <div class="bg-white p-3.5 rounded-xl border border-purple-100 shadow-sm card-hover flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <button onclick="speak('${item.word}')" class="text-purple-600 hover:text-purple-800 p-1 rounded-md hover:bg-purple-50">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                            <span class="font-bold text-slate-800">${item.word}</span>
+                        </div>
+                        <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">${item.chinese}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 bg-slate-50 p-2 rounded-lg"><i>e.g.</i> ${item.example}</p>
+                </div>
+            `).join('');
+
+            // Recite
+            const reciteBox = document.getElementById('reciteContainer');
+            reciteBox.innerHTML = dataRecite.map((item, idx) => `
+                <div class="bg-white p-4 rounded-xl border border-pink-100 shadow-sm card-hover space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold bg-pink-100 text-pink-700 px-2.5 py-0.5 rounded-md">Sentence ${idx + 1}</span>
+                        <button onclick="speak('${item.target.replace(/'/g, "\\'")}')" class="text-pink-600 hover:text-pink-800 font-bold text-xs flex items-center gap-1 bg-pink-50 px-2 py-1 rounded-lg">
+                            <i class="fa-solid fa-volume-high"></i> 播放全句
+                        </button>
+                    </div>
+                    <p class="font-bold text-slate-800 text-sm sm:text-base">${item.target}</p>
+                    <p class="text-xs text-slate-500">${item.chinese}</p>
+                </div>
+            `).join('');
+
+            // Months
+            const monthsBox = document.getElementById('monthsContainer');
+            monthsBox.innerHTML = dataMonths.map(item => `
+                <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm card-hover flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <button onclick="speak('${item.word}')" class="text-blue-600 hover:text-blue-800 p-1">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <span class="font-bold text-slate-800 text-sm">${item.word}</span>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">${item.chinese}</span>
+                </div>
+            `).join('');
+
+            // Verbs + Prepositions
+            const verbBox = document.getElementById('verbPrepContainer');
+            verbBox.innerHTML = dataVerbPrep.map(g => `
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <h3 class="font-bold text-sm text-indigo-700 border-b pb-1">Preposition: "${g.prep}"</h3>
+                    ${g.items.map(item => `
+                        <div class="py-1 text-xs">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="speak('${item.english.replace(/'/g, "\\'")}')" class="text-indigo-600">
+                                        <i class="fa-solid fa-volume-high"></i>
+                                    </button>
+                                    <strong class="text-slate-800">${item.english}</strong>
+                                </div>
+                                <span class="text-slate-500 bg-slate-100 px-2 py-0.5 rounded">${item.chinese}</span>
+                            </div>
+                            <p class="text-slate-400 ml-5 mt-0.5">e.g. ${item.example}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+
+            // Positive & Negative Adj
+            const posBox = document.getElementById('positiveAdjContainer');
+            posBox.innerHTML = dataPositiveAdj.map(item => `
+                <div class="bg-white p-3 rounded-xl border border-emerald-100 shadow-sm text-xs">
+                    <div class="flex justify-between items-center mb-1">
+                        <button onclick="speak('${item.word.replace(/'/g, "\\'")}')" class="text-emerald-600 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-volume-high"></i> ${item.word}
+                        </button>
+                        <span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">${item.chinese}</span>
+                    </div>
+                    <p class="text-slate-500">e.g. ${item.example}</p>
+                </div>
+            `).join('');
+
+            const negBox = document.getElementById('negativeAdjContainer');
+            negBox.innerHTML = dataNegativeAdj.map(item => `
+                <div class="bg-white p-3 rounded-xl border border-rose-100 shadow-sm text-xs">
+                    <div class="flex justify-between items-center mb-1">
+                        <button onclick="speak('${item.word.replace(/'/g, "\\'")}')" class="text-rose-600 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-volume-high"></i> ${item.word}
+                        </button>
+                        <span class="bg-rose-50 text-rose-700 px-2 py-0.5 rounded">${item.chinese}</span>
+                    </div>
+                    <p class="text-slate-500">e.g. ${item.example}</p>
+                </div>
+            `).join('');
+        }
+
+        function filterStudyCategory(catKey) {
+            document.querySelectorAll('.study-cat-btn').forEach(btn => {
+                btn.className = "study-cat-btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all";
+            });
+            const activeBtn = document.getElementById(`study-cat-${catKey}`);
+            if (activeBtn) activeBtn.className = "study-cat-btn bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all";
+
+            const sections = document.querySelectorAll('.study-section');
+            if (catKey === 'all') {
+                sections.forEach(s => s.classList.remove('hidden'));
+            } else {
+                sections.forEach(s => s.classList.add('hidden'));
+                const target = document.getElementById(`section-${catKey}`);
+                if (target) target.classList.remove('hidden');
+            }
+        }
+
+        // Dictation Controller
+        let dictationList = [];
+        let currentDictIdx = 0;
+        let dictationScore = 0;
+
+        function initDictation() {
+            const cat = document.getElementById('dictationCategory').value;
+            dictationList = [];
+
+            if (cat === 'all' || cat === 'feelings') {
+                dataFeelings.forEach(i => dictationList.push({ target: i.word, chinese: i.chinese }));
+            }
+            if (cat === 'all' || cat === 'recite') {
+                dataRecite.forEach(i => dictationList.push({ target: i.target, chinese: i.chinese }));
+            }
+            if (cat === 'all' || cat === 'months') {
+                dataMonths.forEach(i => dictationList.push({ target: i.word, chinese: i.chinese }));
+            }
+            if (cat === 'all' || cat === 'verbs') {
+                dataVerbPrep.forEach(g => g.items.forEach(i => dictationList.push({ target: i.english, chinese: i.chinese })));
+            }
+            if (cat === 'all' || cat === 'personality') {
+                dataPositiveAdj.forEach(i => dictationList.push({ target: i.word, chinese: i.chinese }));
+                dataNegativeAdj.forEach(i => dictationList.push({ target: i.word, chinese: i.chinese }));
+            }
+
+            currentDictIdx = 0;
+            dictationScore = 0;
+            document.getElementById('dictationScoreVal').innerText = '0';
+            updateDictationUI();
+        }
+
+        function updateDictationUI() {
+            if (dictationList.length === 0) return;
+            const item = dictationList[currentDictIdx];
+
+            document.getElementById('dictationCurrentIdx').innerText = currentDictIdx + 1;
+            document.getElementById('dictationTotalIdx').innerText = dictationList.length;
+            document.getElementById('dictationChineseHint').innerText = `中文提示: ${item.chinese}`;
+            document.getElementById('dictationInput').value = '';
+
+            const feedback = document.getElementById('dictationFeedback');
+            feedback.className = 'mt-4 p-3 rounded-xl text-xs sm:text-sm font-bold hidden';
+
+            const percent = ((currentDictIdx + 1) / dictationList.length) * 100;
+            document.getElementById('dictationProgressBar').style.width = `${percent}%`;
+
+            document.getElementById('btnPrevDict').disabled = currentDictIdx === 0;
+            document.getElementById('btnNextDict').innerText = (currentDictIdx === dictationList.length - 1) ? '完成默書' : '下一題';
+
+            setTimeout(playDictationAudio, 300);
+        }
+
+        function playDictationAudio() {
+            if (dictationList[currentDictIdx]) speak(dictationList[currentDictIdx].target);
+        }
+
+        function normalizeText(text) {
+            return text.toLowerCase().trim().replace(/[.,/#!$%^&*;:{}=\-_`~()']/g, "").replace(/\s+/g, ' ');
+        }
+
+        function checkDictationAnswer() {
+            const input = document.getElementById('dictationInput').value;
+            const target = dictationList[currentDictIdx].target;
+            const feedback = document.getElementById('dictationFeedback');
+
+            if (!input.trim()) {
+                feedback.className = "mt-4 p-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-100 text-amber-800 border border-amber-300 block";
+                feedback.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> 請先輸入答案！';
+                return;
+            }
+
+            const isCorrect = normalizeText(input) === normalizeText(target);
+
+            if (isCorrect) {
+                feedback.className = "mt-4 p-3 rounded-xl text-xs sm:text-sm font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 block";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> 太棒了！拼寫正確！ (${target})`;
+                dictationScore += 10;
+                document.getElementById('dictationScoreVal').innerText = dictationScore;
+            } else {
+                feedback.className = "mt-4 p-3 rounded-xl text-xs sm:text-sm font-bold bg-rose-100 text-rose-800 border border-rose-300 block";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> 答案不完全正確。正確答案是: <br><span class="underline">${target}</span>`;
+            }
+        }
+
+        function revealDictationHint() {
+            const target = dictationList[currentDictIdx].target;
+            const hint = target.replace(/[a-zA-Z]/g, (char, index) => (index % 3 === 0 ? char : '_'));
+            const feedback = document.getElementById('dictationFeedback');
+            feedback.className = "mt-4 p-3 rounded-xl text-xs sm:text-sm font-bold bg-blue-100 text-blue-800 border border-blue-300 block";
+            feedback.innerHTML = `<i class="fa-solid fa-lightbulb mr-1"></i> 提示: ${hint}`;
+        }
+
+        function prevDictation() {
+            if (currentDictIdx > 0) {
+                currentDictIdx--;
+                updateDictationUI();
+            }
+        }
+
+        function nextDictation() {
+            if (currentDictIdx < dictationList.length - 1) {
+                currentDictIdx++;
+                updateDictationUI();
+            } else {
+                alert(`默書練習完成！您的最終得分: ${dictationScore} 分！`);
+            }
+        }
+
+        // Quiz Controller
+        let currentQuizIdx = 0;
+        let quizScore = 0;
+        let selectedOptionIdx = null;
+
+        function startQuiz() {
+            currentQuizIdx = 0;
+            quizScore = 0;
+            document.getElementById('quizStartCard').classList.add('hidden');
+            document.getElementById('quizResultCard').classList.add('hidden');
+            document.getElementById('quizContainer').classList.remove('hidden');
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            const q = quizQuestions[currentQuizIdx];
+            selectedOptionIdx = null;
+
+            document.getElementById('quizCurrentNum').innerText = currentQuizIdx + 1;
+            document.getElementById('quizLiveScore').innerText = quizScore;
+            document.getElementById('quizQuestionText').innerText = q.question;
+
+            document.getElementById('quizExplanation').classList.add('hidden');
+
+            const btnNext = document.getElementById('btnNextQuiz');
+            btnNext.disabled = true;
+            btnNext.className = "bg-slate-300 text-slate-500 font-bold px-6 py-2.5 rounded-xl transition-all cursor-not-allowed text-sm";
+
+            const percent = ((currentQuizIdx + 1) / quizQuestions.length) * 100;
+            document.getElementById('quizProgressBar').style.width = `${percent}%`;
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-opt-btn w-full text-left font-semibold p-3.5 rounded-xl border-2 border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 transition-all text-slate-700 flex items-center justify-between text-xs sm:text-sm";
+                btn.onclick = () => selectQuizOption(idx);
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-600">${String.fromCharCode(65 + idx)}</span>
+                        <span>${opt}</span>
+                    </div>
+                    <i class="fa-regular fa-circle text-slate-300 opt-icon"></i>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectQuizOption(optIdx) {
+            if (selectedOptionIdx !== null) return;
+            selectedOptionIdx = optIdx;
+
+            const q = quizQuestions[currentQuizIdx];
+            const isCorrect = optIdx === q.correct;
+
+            document.querySelectorAll('.quiz-opt-btn').forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === q.correct) {
+                    btn.className = "w-full text-left font-semibold p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 flex items-center justify-between text-xs sm:text-sm";
+                    btn.querySelector('.opt-icon').className = "fa-solid fa-circle-check text-emerald-600";
+                } else if (idx === optIdx && !isCorrect) {
+                    btn.className = "w-full text-left font-semibold p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 flex items-center justify-between text-xs sm:text-sm";
+                    btn.querySelector('.opt-icon').className = "fa-solid fa-circle-xmark text-rose-600";
+                }
+            });
+
+            if (isCorrect) {
+                quizScore += 10;
+                document.getElementById('quizLiveScore').innerText = quizScore;
+            }
+
+            const expBox = document.getElementById('quizExplanation');
+            expBox.classList.remove('hidden');
+            expBox.className = isCorrect 
+                ? "p-4 rounded-xl text-xs sm:text-sm bg-emerald-50 text-emerald-800 border border-emerald-200 block"
+                : "p-4 rounded-xl text-xs sm:text-sm bg-rose-50 text-rose-800 border border-rose-200 block";
+            
+            expBox.innerHTML = `<strong>${isCorrect ? '<i class="fa-solid fa-circle-check mr-1"></i> 正確！' : '<i class="fa-solid fa-circle-xmark mr-1"></i> 錯誤。'}</strong> ${q.explanation}`;
+
+            const btnNext = document.getElementById('btnNextQuiz');
+            btnNext.disabled = false;
+            btnNext.className = "bg-pink-600 hover:bg-pink-700 text-white font-bold px-6 py-2.5 rounded-xl shadow transition-all cursor-pointer text-sm";
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizIdx < quizQuestions.length - 1) {
+                currentQuizIdx++;
+                loadQuizQuestion();
+            } else {
+                showQuizResults();
+            }
+        }
+
+        function showQuizResults() {
+            document.getElementById('quizContainer').classList.add('hidden');
+            const resultCard = document.getElementById('quizResultCard');
+            resultCard.classList.remove('hidden');
+
+            const totalScorePossible = quizQuestions.length * 10;
+            document.getElementById('finalScoreText').innerText = `${quizScore} / ${totalScorePossible}`;
+
+            const icon = document.getElementById('resultIcon');
+            const feedback = document.getElementById('scoreFeedback');
+
+            if (quizScore >= totalScorePossible * 0.85) {
+                icon.className = "w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner";
+                feedback.innerText = "太優秀了！表現完美！";
+            } else if (quizScore >= totalScorePossible * 0.6) {
+                icon.className = "w-20 h-20 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner";
+                feedback.innerText = "做得很棒！多溫習錯題會更上一層樓！";
+            } else {
+                icon.className = "w-20 h-20 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner";
+                feedback.innerText = "建議回到「溫習模式」多聽多朗讀後再試一次！";
+            }
+        }
+
+        window.onload = function() {
+            renderStudyView();
+        };
+    </script>
+</body>
+</html>

@@ -44,14 +44,14 @@ textarea{width:100%;min-height:190px;padding:15px;font-size:22px;line-height:1.8
 </div>
 <script>
 const words=["適宜","隨心所欲","鮮艷","奇異","允許","焦黃","滋補","象徵","廉潔","平凡"];
-const passage="有中國人的地方就有豆腐。作湯作菜，配葷配素，無不進宜。苦辣酸甜，隨心所欲。女作家孟瑤說：「它潔白是視覺上的美；它柔軟，是觸覺上的美；它香淡，是味覺上的美。";
+const passage="有中國人的地方就有豆腐。作湯作菜，配葷配素，無不適宜。苦辣酸甜，隨心所欲。女作家孟瑤說：「它潔白；是視覺上的美；它柔軟，是觸覺上的美；它香淡，是味覺上的美。」";
 let score=0,streak=0,mistakes=[],currentIndex=0,quizScore=0;
 
 function speak(text){
  if(!("speechSynthesis"in window)){alert("你的瀏覽器不支援語音功能。");return}
  speechSynthesis.cancel();
  const u=new SpeechSynthesisUtterance(text), voices=speechSynthesis.getVoices();
- let v=voices.find(v=>v.lang.toLowerCase()==="zh-hk")||voices.find(v=>v.lang.toLowerCase().includes("zh-hk"))||voices.find(v=>v.lang.toLowerCase().includes("yue"));
+ let v=voices.find(v=>v.lang.toLowerCase()==="zh-hk")||voices.find(v=>v.la無不適宜ng.toLowerCase().includes("zh-hk"))||voices.find(v=>v.lang.toLowerCase().includes("yue"));
  if(v){u.voice=v;u.lang=v.lang}else u.lang="zh-HK";
  u.rate=.78;u.pitch=1;u.volume=1;speechSynthesis.speak(u);
 }
